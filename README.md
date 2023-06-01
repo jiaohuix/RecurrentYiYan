@@ -23,7 +23,7 @@ python gradio_server.py
 
 **2 未来计划：**
 
-1.修改prompt，避免抄出max_token，生成更高质量的文本
+1.修改prompt，避免超出max_token，并生成更高质量的故事
 
 2.使用langchain管理长期记忆
 
