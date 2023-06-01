@@ -5,6 +5,7 @@
 ##  RecurrentYiYan🔥 
 
 **1 介绍：**
+
 本项目修改自RecurrentGPT，使用文心一言进行长文本的生成（需要能访问网页版一言）。
 
 ```shell
@@ -31,7 +32,7 @@ python gradio_server.py
 
 
 
-**3 bug:**
+**3 Bug:**
 
 - ImportError: DLL load failed while importing _imaging: 找不到指定的模块。
   - pip install --upgrade Pillow
