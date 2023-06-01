@@ -27,26 +27,25 @@ def init_prompt(novel_type, description):
     else:
         description = " about " + description
     return f"""
-Please write a {novel_type} novel{description} with 50 chapters. Follow the format below precisely:
+请写一本关于{novel_type}的{description}中文小说，大约有50个章节。准确地按照下面的格式来写：
+先为小说起一个有趣且容易记忆的书名。 
+接下来，为第1章写一个剧情Outline。Outline应描述小说的背景和开端。
+根据你的Outline，写出小说的前[3]段落及其说明。用小说的风格来写，慢慢地设置场景。
+再写一个摘要，抓住[3]个段落的关键信息。
+最后，写出[3]个不同的指令，说明接下来要写什么，每个指令包含大约五句话。每条指令都应提出一个可能的、有趣的故事的延续。
+输出格式应遵循以下准则，前缀标题用英文显示： 
+Name： <小说的名称>  
+Outline: <第1章的大纲> 
+Paragraph 1: <第1段的内容> 
+Paragraph 2: <第2段的内容> 
+Paragraph 3: <第3段的内容> 
+Summary： <摘要内容>
+Instruction 1: <指令1的内容>
+Instruction 2: <指令2的内容>
+Instruction 3: <指令3的内容>
+确保精确并严格遵循输出格式，不要多写漏写。
 
-Begin with the name of the novel.
-Next, write an outline for the first chapter. The outline should describe the background and the beginning of the novel.
-Write the first three paragraphs with their indication of the novel based on your outline. Write in a novelistic style and take your time to set the scene.
-Write a summary that captures the key information of the three paragraphs.
-Finally, write three different instructions for what to write next, each containing around five sentences. Each instruction should present a possible, interesting continuation of the story.
-The output format should follow these guidelines:
-Name: <name of the novel>
-Outline: <outline for the first chapter>
-Paragraph 1: <content for paragraph 1>
-Paragraph 2: <content for paragraph 2>
-Paragraph 3: <content for paragraph 3>
-Summary: <content of summary>
-Instruction 1: <content for instruction 1>
-Instruction 2: <content for instruction 2>
-Instruction 3: <content for instruction 3>
-
-Make sure to be precise and follow the output format strictly.
-
+确保准确无误，严格遵循输出格式。
 """
 
 def init(novel_type, description, request: gr.Request):
@@ -169,11 +168,11 @@ def on_select(instruction1, instruction2, instruction3, evt: gr.SelectData):
     return selected_plan
 
 
-with gr.Blocks(title="RecurrentGPT", css="footer {visibility: hidden}", theme="default") as demo:
+with gr.Blocks(title="RecurrentYiYan", css="footer {visibility: hidden}", theme="default") as demo:
     gr.Markdown(
         """
     # RecurrentGPT
-    Interactive Generation of (Arbitrarily) Long Texts with Human-in-the-Loop
+        Interactive Generation of (Arbitrarily) Long Texts with Human-in-the-Loop
     """)
     with gr.Tab("Auto-Generation"):
         with gr.Row():

@@ -1,4 +1,4 @@
-from recurrentgpt import RecurrentGPT
+from recurrentyiyan import RecurrentGPT
 from human_simulator import Human
 import json
 import argparse
@@ -9,12 +9,13 @@ from utils import get_init
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-        description='ChatGPT-based automatic novel writing')
+        description='YiYan-based automatic novel writing')
     parser.add_argument('--iter', type=int, default=1)
     parser.add_argument('--r_file', type=str, default='response.txt')
     parser.add_argument('--init_prompt', type=str, default='init_prompt.json')
     parser.add_argument('--type', type=str, default='science fiction')
     parser.add_argument('--topic', type=str, default='')
+    parser.add_argument('--embed_name', type=str, default="GanymedeNil/text2vec-large-chinese")
     args = parser.parse_args()
     prompts = json.load(open(args.init_prompt,'r'))
     init_prompt = prompts['init_prompt'].format(type=args.type,topic=args.topic)
@@ -30,7 +31,7 @@ if __name__ == '__main__':
     }
 
     # Build the semantic search model
-    embedder = SentenceTransformer('multi-qa-mpnet-base-cos-v1')
+    embedder = SentenceTransformer(args.embed_name)
     human = Human(input=start_input_to__human, memory=None, embedder=embedder)
     #select plan
     human.input["output_instruction"] = human.select_plan(args.r_file)

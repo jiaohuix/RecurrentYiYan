@@ -1,22 +1,24 @@
 import re
-import openai
+# import openai
+#
+# def get_api_response(content: str, max_tokens=None):
+#
+#     response = openai.ChatCompletion.create(
+#         model='gpt-3.5-turbo',
+#         messages=[{
+#             'role': 'system',
+#             'content': '你是一个富有创造力且文笔极佳的小说家。'
+#         }, {
+#             'role': 'user',
+#             'content': content,
+#         }],
+#         temperature=0.5,
+#         max_tokens=max_tokens
+#     )
+#
+#     return response['choices'][0]['message']['content']
 
-def get_api_response(content: str, max_tokens=None):
 
-    response = openai.ChatCompletion.create(
-        model='gpt-3.5-turbo',
-        messages=[{
-            'role': 'system',
-            'content': 'You are a helpful and creative assistant for writing novel.'
-        }, {
-            'role': 'user',
-            'content': content,
-        }],
-        temperature=0.5,  
-        max_tokens=max_tokens
-    )
-    
-    return response['choices'][0]['message']['content']
 
 def get_content_between_a_b(a,b,text):
     return re.search(f"{a}(.*?)\n{b}", text, re.DOTALL).group(1).strip()
@@ -28,7 +30,7 @@ def get_init(init_text=None,text=None,response_file=None):
     text: if no .txt file is given, use init prompt to generate
     """
     if not init_text:
-        response = get_api_response(text)
+        response = get_api_response_yiyan(text)
         print(response)
 
         if response_file:
@@ -46,11 +48,11 @@ def get_init(init_text=None,text=None,response_file=None):
         "Paragraph 3":"",
         "Summary": "",
         "Instruction 1":"",
-        "Instruction 2":"", 
-        "Instruction 3":""    
+        "Instruction 2":"",
+        "Instruction 3":""
     }
     paragraphs['name'] = get_content_between_a_b('Name:','Outline',response)
-    
+
     paragraphs['Paragraph 1'] = get_content_between_a_b('Paragraph 1:','Paragraph 2:',response)
     paragraphs['Paragraph 2'] = get_content_between_a_b('Paragraph 2:','Paragraph 3:',response)
     paragraphs['Paragraph 3'] = get_content_between_a_b('Paragraph 3:','Summary',response)
@@ -88,3 +90,103 @@ def parse_instructions(instructions):
     for i in range(len(instructions)):
         output += f"{i+1}. {instructions[i]}\n"
     return output
+
+
+import random
+import time
+from tqdm import tqdm
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+import json
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+'''
+input://textarea[@class="ant-input wBs12eIN"]
+send: //span[@class="pa6BxUpp"]
+open: //span[@class="MO979HM2"]
+close://span[@class="KtNWFhXf"]/span[2]
+del: //button[@class="ant-btn ant-btn-primary ant-btn-sm"]
+output:  //div[@class="SZiJRLGn G4lAynef"]
+'''
+class YiYanSpider(object):
+    def __init__(self, outfile="result.json"):
+        self.url = "https://yiyan.baidu.com/"
+        self.outfile = outfile
+        self._init_driver()
+
+    def _init_driver(self):
+        chrome_options = Options()
+        chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=chrome_options)
+        self.rand_sleep()
+        # self.driver.get(self.url)
+        msg = input("请登录后，按'ok'确认,或'quit'退出：")
+        while msg != "ok":
+            msg = input("请登录后，按'ok'确认,或'quit'退出：")
+            if msg=="quit":
+                break
+
+    def rand_sleep(self,max_time=1):
+        time.sleep(random.uniform(0,max_time))
+
+    def open_new_win(self):
+        new_win = self.driver.find_element(by=By.XPATH, value='''//span[@class="MO979HM2"]''')
+        new_win.click()
+
+    def del_top_win(self):
+        top_win = self.driver.find_elements(by=By.XPATH, value='''//span[@class="KtNWFhXf"]/span[2]''')[0]
+        top_win.click()
+        time.sleep(1)
+        del_btn = self.driver.find_element(by=By.XPATH, value='''//button[@class="ant-btn ant-btn-primary ant-btn-sm"]''')
+        del_btn.click()
+
+    def ask(self, query):
+        input_area = self.driver.find_element(by=By.XPATH, value='''//textarea[@class="ant-input wBs12eIN"]''')
+        input_area.send_keys(query)
+        self.rand_sleep()
+        self.send()
+
+    def get_answer(self):
+        final_text = ""
+        try:
+            time.sleep(5)
+            last_text = "-1"
+            cur_text = "-2"
+            while last_text!=cur_text:
+                time.sleep(1)
+                last_text = cur_text
+                try:
+                    cur_text = self.driver.find_element(by=By.XPATH, value='''//div[@class="SZiJRLGn G4lAynef"]''').text
+                except:
+                    break
+            final_text = cur_text
+        except:
+            pass
+        return final_text
+
+    def send(self):
+        click_btn = self.driver.find_element(by=By.XPATH, value='''//span[@class="pa6BxUpp"]''')
+        click_btn.click()
+
+
+    def run(self, query = ""):
+        self.rand_sleep(2)
+        self.open_new_win()
+        self.ask(query)
+        answer = self.get_answer()
+        self.rand_sleep(1)
+        self.del_top_win()
+
+        res = {"query": query, "answer": answer}
+        return res
+
+yiyan = YiYanSpider()
+def get_api_response_yiyan(content: str, max_tokens=None):
+    response = yiyan.run(query=content)
+    return response["answer"]

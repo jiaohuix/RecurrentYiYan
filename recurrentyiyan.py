@@ -1,4 +1,4 @@
-from utils import get_content_between_a_b, get_api_response
+from utils import get_content_between_a_b, get_api_response_yiyan
 import torch
 
 import random
@@ -6,7 +6,7 @@ import random
 from sentence_transformers import  util
 
 
-class RecurrentGPT:
+class RecurrentYiYan:
 
     def __init__(self, input, short_memory, long_memory, memory_index, embedder):
         self.input = input
@@ -34,19 +34,20 @@ class RecurrentGPT:
         top_k_memory = [self.long_memory[idx] for idx in top_k_idx]
         # combine the top 3 paragraphs
         input_long_term_memory = '\n'.join(
-            [f"Related Paragraphs {i+1} :" + selected_memory for i, selected_memory in enumerate(top_k_memory)])
+                [f"Related Paragraphs {i+1} :" + selected_memory for i, selected_memory in enumerate(top_k_memory)])
         # randomly decide if a new character should be introduced
         if random.random() < new_character_prob:
-            new_character_prompt = f"If it is reasonable, you can introduce a new character in the output paragrah and add it into the memory."
+            new_character_prompt = f"如果它是合理的，你可以在输出段落中引入一个新的字符，并将其添加到Memory中。"
         else:
             new_character_prompt = ""
 
-        input_text = f"""I need you to help me write a novel. Now I give you a memory (a brief summary) of 400 words, you should use it to store the key content of what has been written so that you can keep track of very long context. For each time, I will give you your current memory (a brief summary of previous stories. You should use it to store the key content of what has been written so that you can keep track of very long context), the previously written paragraph, and instructions on what to write in the next paragraph. 
-    I need you to write:
-    1. Output Paragraph: the next paragraph of the novel. The output paragraph should contain around 20 sentences and should follow the input instructions.
-    2. Output Memory: The updated memory. You should first explain which sentences in the input memory are no longer necessary and why, and then explain what needs to be added into the memory and why. After that you should write the updated memory. The updated memory should be similar to the input memory except the parts you previously thought that should be deleted or added. The updated memory should only store key information. The updated memory should never exceed 20 sentences!
-    3. Output Instruction:  instructions of what to write next (after what you have written). You should output 3 different instructions, each is a possible interesting continuation of the story. Each output instruction should contain around 5 sentences
-    Here are the inputs: 
+        input_text = f"""我需要你帮我写一部小说。现在我给你一个400字的Memory（一个简短的总结），你应该用它来存储已经写好的关键内容，这样你就可以记录很长的上下文。每一次，我都会给你当前的Memory（以前的故事的简要总结。你应该用它来存储所写内容的关键内容，这样你就能记下很长的上下文），之前写的段落，以及下一段要写什么的指示。
+
+    我需要你来写：
+    1. Output Paragraph: 小说的下一个段落。输出段应包含约20个句子，并应遵循输入说明。
+    2. Output Memory: 更新后的Memory。你应该首先解释输入Memory中的哪些句子不再需要，为什么，然后解释需要添加到Memory中的内容，为什么。之后，你应该写出更新的Memory。除了你之前认为应该删除或添加的部分，更新后的Memory应该与输入Memory相似。更新后的Memory应该只存储关键信息。更新后的Memory不应该超过20个句子！
+    3. Output Instruction：接下来要写什么的指令（在你写完之后）。你应该输出3个不同的指令，每个指令都是故事的一个可能的有趣的延续。每个输出指令应该包含大约5个句子
+    以下是输入的内容：
 
     Input Memory:  
     {self.short_memory}
@@ -60,24 +61,24 @@ class RecurrentGPT:
     Input Related Paragraphs:
     {input_long_term_memory}
     
-    Now start writing, organize your output by strictly following the output format as below:
+    现在开始写，严格按照下面的输出格式来组织你的输出：
     Output Paragraph: 
-    <string of output paragraph>, around 20 sentences.
+    <string of output paragraph>,大约20句话。
 
     Output Memory: 
-    Rational: <string that explain how to update the memory>;
-    Updated Memory: <string of updated memory>, around 10 to 20 sentences
+    Rational: <解释如何更新Memory的文本>;
+    Updated Memory: <更新的Memory的文本>, around 10 to 20 sentences
 
     Output Instruction: 
-    Instruction 1: <content for instruction 1>, around 5 sentences
-    Instruction 2: <content for instruction 2>, around 5 sentences
-    Instruction 3: <content for instruction 3>, around 5 sentences
+    Instruction 1: <指令1内容>，大约5句话。
+    Instruction 2: <指令2内容>，大约5句话。
+    Instruction 3: <指令3内容>，大约5句话。
 
-    Very important!! The updated memory should only store key information. The updated memory should never contain over 500 words!
-    Finally, remember that you are writing a novel. Write like a novelist and do not move too fast when writing the output instructions for the next paragraph. Remember that the chapter will contain over 10 paragraphs and the novel will contain over 100 chapters. And this is just the begining. Just write some interesting staffs that will happen next. Also, think about what plot can be attractive for common readers when writing output instructions. 
+    非常重要！! 更新的Memory应该只存储关键信息。更新后的Memory不应该包含超过500个字！！！！
+    最后，记住你在写一本小说。像小说家一样写作，在写下一段的输出指令时不要走得太快。记住，这一章将包含10多段，小说将包含100多章。而这仅仅是个开始。只要写出一些接下来会发生的有趣的人员。另外，在写输出说明时，要考虑什么情节能吸引普通读者。
 
-    Very Important: 
-    You should first explain which sentences in the input memory are no longer necessary and why, and then explain what needs to be added into the memory and why. After that, you start rewrite the input memory to get the updated memory. 
+    非常重要： 
+    你应该首先解释输入Memory中的哪些句子不再需要了，为什么，然后解释需要添加到Memory中的内容，为什么。之后，你开始重写输入Memory，得到更新的Memory。
     {new_character_prompt}
     """
         return input_text
@@ -120,11 +121,11 @@ class RecurrentGPT:
 
         print(prompt+'\n'+'\n')
 
-        response = get_api_response(prompt)
+        response = get_api_response_yiyan(prompt)
 
         self.output = self.parse_output(response)
         while self.output == None:
-            response = get_api_response(prompt)
+            response = get_api_response_yiyan(prompt)
             self.output = self.parse_output(response)
         if response_file:
             with open(response_file, 'a', encoding='utf-8') as f:
