@@ -11,7 +11,7 @@
 
 ```shell
 pip installl -r requirements.txt
-# 指定谷歌浏览器打开的端口，使用selenium连接，从而使用api获取一言的输出
+# 指定谷歌浏览器打开的端口，使用selenium连接，从而使用python获取一言的输出
 ./chrome.exe --remote-debugging-port=9222  --user-data-dir=D:\\selenium
 # 命令行
 python main.py --type '科幻小说' --topic 'AI克隆人、意识上传、机械飞升' --iter 3
