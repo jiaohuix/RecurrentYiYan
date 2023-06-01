@@ -7,7 +7,7 @@
 
 **1 介绍：**
 
-本项目修改自 [RecurrentGPT](https://github.com/aiwaves-cn/RecurrentGPT)，使用文心一言进行长文本的生成（需要能访问网页版一言）。
+本项目修改自 [RecurrentGPT](https://github.com/aiwaves-cn/RecurrentGPT)，使用文心一言进行中文的长文本生成（需要能访问网页版一言）。
 
 ```shell
 pip installl -r requirements.txt
