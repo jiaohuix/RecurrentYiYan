@@ -29,7 +29,7 @@ python gradio_server.py
 
 3.使用其他的语言模型在小说上微调，如ChatGlm，RWKV
 
-3.写小说哈哈
+4.写沙雕小说哈哈√
 
 
 
