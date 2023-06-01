@@ -1,6 +1,7 @@
 import gradio as gr
 
-from recurrentgpt import RecurrentGPT
+from recurrentyiyan import RecurrentYiYan
+
 from human_simulator import Human
 from sentence_transformers import SentenceTransformer
 from utils import get_init, parse_instructions
@@ -99,7 +100,7 @@ def step(short_memory, long_memory, instruction1, instruction2, instruction3, cu
         writer_start_input = human.output
 
         # Init writerGPT
-        writer = RecurrentGPT(input=writer_start_input, short_memory=start_short_memory, long_memory=[
+        writer = RecurrentYiYan(input=writer_start_input, short_memory=start_short_memory, long_memory=[
             init_paragraphs['Paragraph 1'], init_paragraphs['Paragraph 2']], memory_index=None, embedder=embedder)
         cache["writer"] = writer
         cache["human"] = human
@@ -141,7 +142,7 @@ def controled_step(short_memory, long_memory, selected_instruction, current_para
         writer_start_input = human.output
 
         # Init writerGPT
-        writer = RecurrentGPT(input=writer_start_input, short_memory=start_short_memory, long_memory=[
+        writer = RecurrentYiYan(input=writer_start_input, short_memory=start_short_memory, long_memory=[
             init_paragraphs['Paragraph 1'], init_paragraphs['Paragraph 2']], memory_index=None, embedder=embedder)
         cache["writer"] = writer
         cache["human"] = human

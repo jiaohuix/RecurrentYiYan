@@ -74,13 +74,13 @@ class Human:
     以前写的段落：
     {previous_paragraph}
 
-    由你的ChatGPT助手维护的主要故事情节的摘要：
+    由你的YiYan助手维护的主要故事情节的摘要：
     {memory}
 
-    您的ChatGPT助理写的新段落：
+    您的YiYan助理写的新段落：
     {writer_new_paragraph}
 
-    由你的ChatGPT助理提出的下一步写什么的三个计划：
+    由你的YiYan助理提出的下一步写什么的三个计划：
     {parse_instructions(previous_plans)}
 
     现在开始选择，严格按照下面的输出格式来组织你的输出：

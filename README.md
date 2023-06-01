@@ -1,7 +1,40 @@
-# RecurrentGPT
+# RecurrentYiYan
 
 <p align="center"><a href="https://arxiv.org/pdf/2305.13304.pdf">[📄 Paper]</a> | <a href="https://www.aiwaves.org/recurrentgpt">[🤗 Demo - Writing Assistant]</a> | <a href="https://www.aiwaves.org/interactivefiction">[🤗 Demo - Interactive Fiction]</a> |  <a href="https://www.youtube.com/watch?v=rMnw3ljCibc">[📺 Video]</a> | <a href="https://discord.gg/aNznfrYPeR">[🔥 Discord]</a> </p>
 <hr>
+## 🔥 RecurrentYiYan
+
+1 本项目修改自RecurrentGPT，使用文心一言进行长文本的生成（需要能访问网页版一言）。
+
+```shell
+pip installl -r requirements.txt
+# 指定谷歌浏览器打开的端口，使用selenium连接，从而使用api获取一言的输出
+./chrome.exe --remote-debugging-port=9222  --user-data-dir=D:\\selenium
+# 命令行
+python main.py --type '科幻小说' --topic 'AI克隆人、意识上传、机械飞升' --iter 3
+# gradio 
+python gradio_server.py
+```
+
+[![p9zIkE4.png](https://s1.ax1x.com/2023/06/02/p9zIkE4.png)](https://imgse.com/i/p9zIkE4)
+
+2 未来计划：
+
+1.修改prompt，避免抄出max_token，生成更高质量的文本
+
+2.使用langchain管理长期记忆
+
+3.使用其他的语言模型在小说上微调，如ChatGlm，RWKV
+
+3.写小说哈哈
+
+
+
+3 bug:
+
+- ImportError: DLL load failed while importing _imaging: 找不到指定的模块。
+  - pip install --upgrade Pillow
+  - https://stackoverflow.com/questions/66385979/dll-load-failed-while-importing-imaging
 
 ## Framework Illustration
 <div align=center>

@@ -19,9 +19,12 @@ import re
 #     return response['choices'][0]['message']['content']
 
 
-
-def get_content_between_a_b(a,b,text):
-    return re.search(f"{a}(.*?)\n{b}", text, re.DOTALL).group(1).strip()
+def get_content_between_a_b(a, b, text):
+    match = re.search(f"{a}(.*?){b}", text, re.DOTALL)
+    if match:
+        return match.group(1).strip().lstrip(":").lstrip("：")
+    else:
+        return ""
 
 
 def get_init(init_text=None,text=None,response_file=None):
@@ -30,6 +33,7 @@ def get_init(init_text=None,text=None,response_file=None):
     text: if no .txt file is given, use init prompt to generate
     """
     if not init_text:
+        print("\ncall yiyan ing...")
         response = get_api_response_yiyan(text)
         print(response)
 
@@ -126,9 +130,9 @@ class YiYanSpider(object):
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=chrome_options)
         self.rand_sleep()
         # self.driver.get(self.url)
-        msg = input("请登录后，按'ok'确认,或'quit'退出：")
+        msg = input("请登录https://yiyan.baidu.com/后，按'ok'确认,或'quit'退出：")
         while msg != "ok":
-            msg = input("请登录后，按'ok'确认,或'quit'退出：")
+            msg = input("请登录https://yiyan.baidu.com/后，按'ok'确认,或'quit'退出：")
             if msg=="quit":
                 break
 
@@ -149,7 +153,7 @@ class YiYanSpider(object):
     def ask(self, query):
         input_area = self.driver.find_element(by=By.XPATH, value='''//textarea[@class="ant-input wBs12eIN"]''')
         input_area.send_keys(query)
-        self.rand_sleep()
+        time.sleep(1)
         self.send()
 
     def get_answer(self):
@@ -176,12 +180,14 @@ class YiYanSpider(object):
 
 
     def run(self, query = ""):
+        query = query.replace("\n","")
         self.rand_sleep(2)
         self.open_new_win()
         self.ask(query)
         answer = self.get_answer()
         self.rand_sleep(1)
-        self.del_top_win()
+        # 删除对话窗口
+        # self.del_top_win()
 
         res = {"query": query, "answer": answer}
         return res

@@ -1,0 +1,4 @@
+selenium
+webdriver-manager
+sentence-transformers==2.2.1
+gradio

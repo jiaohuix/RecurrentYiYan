@@ -3,7 +3,7 @@
 iteration=10
 outfile=response.txt
 init_prompt=init_prompt.json
-topic=Aliens
+topic="AI克隆人"
 type="科幻小说"
 
 
