@@ -157,13 +157,14 @@ class YiYanSpider(object):
         self.send()
 
     def get_answer(self):
+        time.sleep(10)
         final_text = ""
         try:
-            time.sleep(5)
+            # time.sleep(5)
             last_text = "-1"
             cur_text = "-2"
             while last_text!=cur_text:
-                time.sleep(1)
+                time.sleep(2)
                 last_text = cur_text
                 try:
                     cur_text = self.driver.find_element(by=By.XPATH, value='''//div[@class="SZiJRLGn G4lAynef"]''').text
@@ -191,6 +192,10 @@ class YiYanSpider(object):
 
         res = {"query": query, "answer": answer}
         return res
+
+    def ask_long(self):
+        # 当query过长时，分多次输入，第一段结尾：指令还没结束，请等待并不要输出 ，第二段做一个前移，然后说接着上一段指令，
+        pass
 
 yiyan = YiYanSpider()
 def get_api_response_yiyan(content: str, max_tokens=None):

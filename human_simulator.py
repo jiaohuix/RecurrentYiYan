@@ -13,18 +13,19 @@ class Human:
         self.output = {}
 
 
+    # 扩写指令
     def prepare_input(self):
+        print("Human expanding text ...\n")
         previous_paragraph = self.input["input_paragraph"]
         writer_new_paragraph = self.input["output_paragraph"]
-        memory = self.input["output_memory"]
-        user_edited_plan = self.input["output_instruction"]
+        memory = self.input["output_memory"] # 段落、主要故事情节的摘要，以及下一步写什么的计划（由YiYan助手写的）
+        user_edited_plan = self.input["output_instruction"] # 和一个由你的YiYan助手写的段落，一个YiYan助手维护的主要故事情节的摘要，以及一个YiYan助手提出的下一步写什么的计划。
 
-        input_text = f"""
-    现在想象一下，你是一个小说家，在YiYan的帮助下写一本中文小说。你会得到一个先前写好的段落（由你写），和一个由你的YiYan助手写的段落，一个YiYan助手维护的主要故事情节的摘要，以及一个YiYan助手提出的下一步写什么的计划。
-    我需要你来写：
-    1. Extended Paragraph： 将YiYan助手写的新段落延长到您的YiYan助手写的段落长度的两倍。
-    2. Selected Plan： 复制您的YiYan助手提出的计划。
-    3. Selected Plan： 将选定的计划修订为下一段的纲要。
+        input_text = f"""你是一位富于创造力和文笔极佳的小说家，在YiYan的帮助下写一本中文小说。你会得到一个你先前写好的段落（你写的），以及由YiYan写的三个部分：新写的段落、维护的主要情节的摘要，下一步写什么的计划。
+    你需要按照格式写：
+    1. Extended Paragraph: 将YiYan助手写的新段落扩写到2倍长度。
+    2. Selected Plan: 复制您的YiYan助手提出的计划。
+    3. Revised Plan: 将选定的计划修订为下一段的纲要，扩写成5句话。
     
     以前写的段落： 
     {previous_paragraph}
@@ -41,49 +42,50 @@ class Human:
     现在开始写，严格按照下面的输出格式来组织你的输出，所有输出仍然保持是中文：
     
     Extended Paragraph：
-    <string of output paragraph>, 大约40-50个句话.
+    <输出扩写的段落文本>, 大约40-50个句话.
 
     Selected Plan：
-    <copy the plan here>
+    <拷贝选择的Plan到这>
 
-    Selected Plan：
-    <string of revised plan>,保持简短，大约5-7句话。
+    Revised Plan:
+    <修订选择的Plan的文本>,保持简短，大约5-7句话。
 
-    非常重要：
-    记住，你是在写一本小说。像小说家一样写作，在写下一段的计划时不要走得太快。在选择和扩展计划时，要考虑计划如何对普通读者具有吸引力。记住要遵循长度限制! 记住，这一章将包含10多段，而小说将包含100多章。而下一段将是第二章的第二段。你需要为未来的故事留出空间。
-
+    重要！：
+    记住你要像小说家一样写小说，在写下一段的Plan时节奏不宜过快，在选择和扩展Plan时，要考虑剧情如何对普通读者有吸引力。
+    记住要遵循长度限制! 这一章将包含10多段话，而小说将包含50多章。而下一段将是第二章的第二段。你需要为未来的故事留出空间。
     """
         return input_text
     
     def parse_plan(self,response):
         plan = get_content_between_a_b('Selected Plan:','Reason',response)
+        print("\nYour selecetd plan :\n ", plan)
         return plan
 
 
     def select_plan(self,response_file):
+        print("Human selectplan ing...\n")
         
         previous_paragraph = self.input["input_paragraph"]
         writer_new_paragraph = self.input["output_paragraph"]
         memory = self.input["output_memory"]
         previous_plans = self.input["output_instruction"]
         prompt = f"""
-    现在想象一下，你是一个帮助小说家做决定的助手。你将得到一个以前写的段落和一个由YiYan写作助理写的段落，一个由YiYan助理保持的主要故事情节的摘要，以及接下来要写的三个不同的可能计划。
-    我需要你
-    选择由YiYan助手提出的最有趣和最合适的计划。
+    你是一个帮助小说家做决定的助手。你将得到一个以前写的段落和由YiYan写作助理写的三部分：新写的段落、主要剧情的摘要，以及未来的三个写作Plan。
+    你要选择一个由YiYan助手提出的最有趣和最合适的计划。
 
-    以前写的段落：
+    你以前写的段落：
     {previous_paragraph}
 
-    由你的YiYan助手维护的主要故事情节的摘要：
+    YiYan维护的主要剧情的摘要：
     {memory}
 
-    您的YiYan助理写的新段落：
+    YiYan写的新段落：
     {writer_new_paragraph}
 
-    由你的YiYan助理提出的下一步写什么的三个计划：
+    YiYan提出的下一步写什么的三个计划：
     {parse_instructions(previous_plans)}
 
-    现在开始选择，严格按照下面的输出格式来组织你的输出：
+    现在开始选择并解释，严格按照下面的输出格式来组织你的输出：
       
     Selected Plan: 
     <将选定的计划复制到这里>
@@ -141,6 +143,10 @@ class Human:
         while self.output == None:
             response = get_api_response_yiyan(prompt)
             self.output = self.parse_output(response)
+        print(f"Human Step: \n {response}")
         if response_file:
             with open(response_file, 'a', encoding='utf-8') as f:
                 f.write(f"Human's output here:\n{response}\n\n")
+
+    def step_with_edit(self):
+        pass

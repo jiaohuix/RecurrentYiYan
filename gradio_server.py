@@ -18,9 +18,10 @@ import re
 
 _CACHE = {}
 
-
+embed_name = "GanymedeNil/text2vec-large-chinese"
+embed_name = "shibing624/text2vec-base-chinese"
 # Build the semantic search model
-embedder = SentenceTransformer('multi-qa-mpnet-base-cos-v1')
+embedder = SentenceTransformer(embed_name)
 
 def init_prompt(novel_type, description):
     if description == "":
@@ -84,8 +85,10 @@ def step(short_memory, long_memory, instruction1, instruction2, instruction3, cu
     global _CACHE
     # print(list(_CACHE.keys()))
     # print(request.headers.get('cookie'))
-    cookie = request.headers['cookie']
-    cookie = cookie.split('; _gat_gtag')[0]
+    import time
+    cookie = str(time.time())
+    # cookie = request.headers['cookie']
+    # cookie = cookie.split('; _gat_gtag')[0]
     cache = _CACHE[cookie]
 
     if "writer" not in cache:
@@ -126,7 +129,7 @@ def controled_step(short_memory, long_memory, selected_instruction, current_para
     if current_paras == "":
         return "", "", "", "", "", ""
     global _CACHE
-    # print(list(_CACHE.keys()))
+    print(list(_CACHE.keys()))
     # print(request.headers.get('cookie'))
     cookie = request.headers['cookie']
     cookie = cookie.split('; _gat_gtag')[0]
@@ -137,7 +140,8 @@ def controled_step(short_memory, long_memory, selected_instruction, current_para
         init_paragraphs = cache["init_paragraphs"]
         human = Human(input=start_input_to_human,
                       memory=None, embedder=embedder)
-        human.step_with_edit()
+        # human.step_with_edit()
+        human.step()
         start_short_memory = init_paragraphs['Summary']
         writer_start_input = human.output
 
@@ -172,8 +176,8 @@ def on_select(instruction1, instruction2, instruction3, evt: gr.SelectData):
 with gr.Blocks(title="RecurrentYiYan", css="footer {visibility: hidden}", theme="default") as demo:
     gr.Markdown(
         """
-    # RecurrentGPT
-        Interactive Generation of (Arbitrarily) Long Texts with Human-in-the-Loop
+    # RecurrentYiYan
+        Recurrent YiYan: Interactively use YiYan to generate Chinese long text
     """)
     with gr.Tab("Auto-Generation"):
         with gr.Row():
@@ -187,8 +191,8 @@ with gr.Blocks(title="RecurrentYiYan", css="footer {visibility: hidden}", theme=
                             description = gr.Textbox(label="Description")
                 btn_init = gr.Button(
                     "Init Novel Generation", variant="primary")
-                gr.Examples(["Science Fiction", "Romance", "Mystery", "Fantasy",
-                            "Historical", "Horror", "Thriller", "Western", "Young Adult", ], inputs=[novel_type])
+                gr.Examples(["科幻", "浪漫", "悬疑", "幻想",
+                            "历史", "恐怖", "惊悚", "西部"], inputs=[novel_type])
                 written_paras = gr.Textbox(
                     label="Written Paragraphs (editable)", max_lines=21, lines=21)
             with gr.Column():
@@ -238,8 +242,8 @@ with gr.Blocks(title="RecurrentYiYan", css="footer {visibility: hidden}", theme=
                             description = gr.Textbox(label="Description")
                 btn_init = gr.Button(
                     "Init Novel Generation", variant="primary")
-                gr.Examples(["Science Fiction", "Romance", "Mystery", "Fantasy",
-                            "Historical", "Horror", "Thriller", "Western", "Young Adult", ], inputs=[novel_type])
+                gr.Examples(["科幻", "浪漫", "悬疑", "幻想",
+                            "历史", "恐怖", "惊悚", "西部"], inputs=[novel_type])
                 written_paras = gr.Textbox(
                     label="Written Paragraphs (editable)", max_lines=23, lines=23)
             with gr.Column():
@@ -279,4 +283,4 @@ with gr.Blocks(title="RecurrentYiYan", css="footer {visibility: hidden}", theme=
 
 if __name__ == "__main__":
     demo.launch(server_port=8005, share=True,
-                server_name="0.0.0.0", show_api=False)
+                server_name="127.0.0.1", show_api=False)
