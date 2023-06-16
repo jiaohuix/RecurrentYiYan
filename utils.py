@@ -124,15 +124,23 @@ class YiYanSpider(object):
         self.outfile = outfile
         self._init_driver()
 
+        self.input_xpath = '''//textarea[@class="ant-input wBs12eIN"]'''
+        self.click_xpath = '''//span[@class="VAtmtpqL"]'''
+        self.open_xpath = '''//span[@class="MO979HM2"]'''
+        self.close_xpath = '''//span[@class="KtNWFhXf"]/span[2]'''
+        self.del_xpath = '''//button[@class="ant-btn ant-btn-primary ant-btn-sm"]'''
+        self.output_xpath = '''//div[@class="q4y8uP0A"]'''
+
     def _init_driver(self):
         chrome_options = Options()
         chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=chrome_options)
         self.rand_sleep()
         # self.driver.get(self.url)
-        msg = input("请登录https://yiyan.baidu.com/后，按'ok'确认,或'quit'退出：")
+        msg_text = "请手动登录https://yiyan.baidu.com/后，按'ok'确认,或'quit'退出："
+        msg = input(msg_text)
         while msg != "ok":
-            msg = input("请登录https://yiyan.baidu.com/后，按'ok'确认,或'quit'退出：")
+            msg = input(msg_text)
             if msg=="quit":
                 break
 
@@ -140,18 +148,18 @@ class YiYanSpider(object):
         time.sleep(random.uniform(0,max_time))
 
     def open_new_win(self):
-        new_win = self.driver.find_element(by=By.XPATH, value='''//span[@class="MO979HM2"]''')
+        new_win = self.driver.find_element(by=By.XPATH, value=self.open_xpath)
         new_win.click()
 
     def del_top_win(self):
-        top_win = self.driver.find_elements(by=By.XPATH, value='''//span[@class="KtNWFhXf"]/span[2]''')[0]
+        top_win = self.driver.find_elements(by=By.XPATH, value=self.close_xpath)[0]
         top_win.click()
         time.sleep(1)
-        del_btn = self.driver.find_element(by=By.XPATH, value='''//button[@class="ant-btn ant-btn-primary ant-btn-sm"]''')
+        del_btn = self.driver.find_element(by=By.XPATH, value=self.del_xpath)
         del_btn.click()
 
     def ask(self, query):
-        input_area = self.driver.find_element(by=By.XPATH, value='''//textarea[@class="ant-input wBs12eIN"]''')
+        input_area = self.driver.find_element(by=By.XPATH, value=self.input_xpath)
         input_area.send_keys(query)
         time.sleep(1)
         self.send()
@@ -167,7 +175,7 @@ class YiYanSpider(object):
                 time.sleep(2)
                 last_text = cur_text
                 try:
-                    cur_text = self.driver.find_element(by=By.XPATH, value='''//div[@class="SZiJRLGn G4lAynef"]''').text
+                    cur_text = self.driver.find_element(by=By.XPATH, value=self.output_xpath).text
                 except:
                     break
             final_text = cur_text
@@ -176,7 +184,7 @@ class YiYanSpider(object):
         return final_text
 
     def send(self):
-        click_btn = self.driver.find_element(by=By.XPATH, value='''//span[@class="pa6BxUpp"]''')
+        click_btn = self.driver.find_element(by=By.XPATH, value=self.click_xpath)
         click_btn.click()
 
 
